@@ -1,5 +1,11 @@
 @props(['document' => null])
-<article class="persona-document-item">
+@php
+    $isExpired = $document->isExpired();
+@endphp
+<article class="persona-document-item persona-document-item--{{ $document->status }}"
+    data-status="{{ $document->status }}"
+    aria-label="{{ ucwords(str_replace('_', ' ', $document->type)) }} {{ $document->status }}"
+>
     <div class="persona-document-item__main">
         <span class="persona-document-item__type">{{ ucwords(str_replace('_', ' ', $document->type)) }}</span>
         <span class="persona-document-item__number">
@@ -9,14 +15,25 @@
                 —
             @endif
         </span>
-        @if($document->expires_at)
-            <span
-                class="persona-document-item__expiry @if($document->isExpired()) persona-document-item__expiry--expired @endif"
-                aria-label="{{ $document->isExpired() ? __('Expired') : __('Expires') }} {{ $document->expires_at->format('M j, Y') }}"
-            >
-                {{ $document->isExpired() ? __('Expired') : __('Expires') }} {{ $document->expires_at->format('M j, Y') }}
-            </span>
-        @endif
+
+        <span class="persona-document-item__meta">
+            @if($document->country_code)
+                <span class="persona-chip">{{ $document->country_code }}</span>
+            @endif
+            @if($document->issued_at)
+                <span class="persona-document-item__issued">
+                    {{ __('Issued :date', ['date' => $document->issued_at->format('M j, Y')]) }}
+                </span>
+            @endif
+            @if($document->expires_at)
+                <span
+                    class="persona-document-item__expiry @if($isExpired) persona-document-item__expiry--expired @endif"
+                    aria-label="{{ $isExpired ? __('Expired') : __('Expires') }} {{ $document->expires_at->format('M j, Y') }}"
+                >
+                    {{ $isExpired ? __('Expired') : __('Expires') }} {{ $document->expires_at->format('M j, Y') }}
+                </span>
+            @endif
+        </span>
     </div>
 
     <span
